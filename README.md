@@ -78,6 +78,24 @@ AI：先用 Profiling 采集（引导命令），拿到四个指标：
 
 > 完整分步见 [references/deployment-workflow.md](references/deployment-workflow.md)、[references/perf-tuning.md](references/perf-tuning.md)。
 
+### 实战：先用脚本跑一步（推荐）
+
+配合仓库里的 `scripts/`，让 AI 先让用户快速拿到"事实"：
+
+```
+你：帮我看看这台昇腾服务器正常不。
+AI：请先在服务器上跑这条只读检测脚本（不装不改）：
+   bash scripts/check_env.sh      # 或 curl 下载后运行
+然后把输出贴给我，我逐项解读设备/驱动/CANN/框架状态。
+```
+
+遇到报错可直接跑快速诊断：
+```bash
+bash scripts/quick_troubleshoot.sh    # ✗ 项即问题点 + 指向手册章节
+```
+
+> 脚本只读、无危险操作。见 [scripts/](scripts/)。
+
 ## 混合模式：何时用官方 agent-skills
 
 本 Skill 采用混合模式：

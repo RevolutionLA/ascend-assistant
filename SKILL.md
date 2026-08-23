@@ -72,6 +72,20 @@ python -c "import mindspore; mindspore.set_device('Ascend'); mindspore.run_check
 uname -a; cat /etc/os-release
 ```
 
+**快速检测（推荐）**：若用户可在服务器上跑脚本，优先让 AI 提供并运行：
+
+```bash
+# 环境一键检测
+bash <(curl -sL https://raw.githubusercontent.com/RevolutionLA/ascend-assistant/master/scripts/check_env.sh)
+# 或上手后本地跑
+bash scripts/check_env.sh
+
+# 常见问题快速诊断
+bash scripts/quick_troubleshoot.sh
+```
+
+> AI 助手应主动把脚本取到本地（或让用户 wget/curl 下载再 bash 运行），基于脚本输出做事实判读；脚本仅只读，无危险操作。见仓库 `scripts/`。
+
 **分层确定性语言（本 Skill 硬性要求）**：
 - **事实层**：设备有无、驱动版本、报错文本 —— 用断言语调。
 - **归因层**：问题可能原因 —— 用 `可能 / probable`；证据不足 → `insufficient_evidence`，明说"需进一步验证"。
@@ -121,8 +135,16 @@ uname -a; cat /etc/os-release
 | 设备管理命令大全 | `npu-smi` | health/temp/power/memory/ECC/虚拟化/证书 |
 | vLLM-Ascend 服务部署 | `vllm-ascend-deploy` | 推理部署专项 |
 | Docker 跑昇腾容器 | `ascend-docker` | 容器环境 |
-| AscendC / Triton 算子开发 | `ascendc-operator-*` / `triton-operator-*` | 算子全流程 |
+| AscendC 算子开发全流程 | `ascendc-operator-*` | code-gen / design / dev / performance-optim / precision-eval 等 |
+| Triton 算子开发全流程 | `triton-operator-*` | code-gen / design / dev / env-config 等 |
+| CATLASS 算子优化 | `catlass-operator-*` | 高性能模板 |
 | ATB 加速 / 算子迁移 | `ascend-transformer-boost` | index skill 编排子 skills |
+| 模型转换 | `atc-model-converter` | 模型转 OM |
+| MindSpeed-LLM 大规模训练/迁移 | `mindspeed-*` / `megatron-*` | 训练加速与迁移 |
+| CANN/算子环境配置 | `cann-operator-env-config` / `cann-nnal-installer` | 环境就绪 |
+| 分布式/集合通信 | `hccl-test` | HCCL 验证 |
+| Kubernetes 昇腾 | `k8s-check-fix` | 容器调度 |
+| 模型/代码评审 | `npu-adapter-reviewer` / `security-code-review` / `skill-auditor` | 质量把关 |
 
 **路由规则**：
 1. 用户请求属于上表专项 → 明确告知用户"这属于官方 `Ascend/agent-skills` 的 `X` skill 能力"，并给出仓库路径与触发方式；若用户的环境已装该 skill，直接按该 skill 执行。
