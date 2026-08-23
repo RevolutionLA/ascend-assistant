@@ -44,9 +44,57 @@ git clone https://github.com/RevolutionLA/ascend-assistant.git
 - "按 7 步带我把这台裸机昇腾服务器跑起来" （→ 部署引导）
 - "推理吞吐低，帮我分析怎么调优" （→ 性能调优）
 
+## 端到端用例演示
+
+### 用例 A：新到一台裸机，让它跑起推理
+
+```
+你：这是一台 Atlas 800I A3，8 卡，帮我从零装好并跑起 Qwen 推理。
+AI：好的。先确认系统和目标：
+   1) 你先跑 uname -a、npu-smi info 看当前状态（可能还没装驱动）
+   2) 我们按 7 步走推进：OS → 固件驱动 → CANN → 框架 → 推理
+   （逐步引导，每步给命令 + 验证，报错即回到排障）
+```
+
+### 用例 B：torch_npu 报错排障
+
+```
+你：python -c "import torch, torch_npu" 报 driver not initialized
+AI：先确认事实（断言语调）：
+   - 让我先看你的 npu-smi info 和驱动版本。
+   （若设备未被识别 → 查驱动/内核匹配；若识别但框架报错 → 查 torch/torch_npu 配套）
+   给一条命令验证，确凿后再给修复方向（用"可能"，不臆断）。
+```
+
+### 用例 C：性能太慢，要调优
+
+```
+你：推理吞吐很低，帮我看看。
+AI：先用 Profiling 采集（引导命令），拿到四个指标：
+   算子耗时 / 通信占比 / HBM 利用 / 显存。
+   然后按现象给方向（用"可能/建议"）。
+   （如果是复杂 profiling 异常 → 建议路由到官方 ascend-profiling-anomaly skill）
+```
+
+> 完整分步见 [references/deployment-workflow.md](references/deployment-workflow.md)、[references/perf-tuning.md](references/perf-tuning.md)。
+
+## 混合模式：何时用官方 agent-skills
+
+本 Skill 采用混合模式：
+
+- **通用请求**：由本 Skill 内建完成（环境检测/基础排障/命令确认/整体部署引导/基础调优）。
+- **专项请求**：自动路由到昇腾官方 [Ascend/agent-skills](https://github.com/Ascend/agent-skills) 里更成熟的专项 skill，例如：
+  - 复杂 Profiling 异常分析 → `ascend-profiling-anomaly`
+  - NPU/固件自动安装 → `ascend-npu-driver-install`
+  - 设备管理命令大全 → `npu-smi`
+  - vLLM-Ascend 部署 → `vllm-ascend-deploy`
+  - 算子开发 → `ascendc-operator-*` / `triton-operator-*`
+
+> 路由规则见 [SKILL.md](SKILL.md) 的「官方 skill 路由表」。这样既吸收官方成熟能力，又避免重复造轮子。
+
 ## 能力详解 & 配套手册
 
-完整能力说明见 [SKILL.md](SKILL.md)。
+完整能力说明见 [SKILL.md](SKILL.md)（含 `references/` 参考文件：报错映射/命令库/部署工作流/调优方向）。
 详细教程与 FAQ 见 **AscendMate（昇腾之家）**：
 - 环境搭建 / 7 步走：<https://github.com/RevolutionLA/AscendMate>
 - 在线文档站：<https://revolutionla.github.io/AscendMate/>
