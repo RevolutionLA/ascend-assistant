@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<title>Ascend Assistant · 昇腾服务器助手 — Agent Skill</title>
+<meta name="description" content="Ascend Assistant · 昇腾服务器助手 —— 让 AI 直接帮你操作/查询/排障华为昇腾智算服务器的 Agent Skill。环境检测、排障、命令生成、部署引导、性能调优。" />
+<meta name="author" content="刘昂 (RevolutionLA)" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://RevolutionLA.github.io/ascend-assistant/" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Ascend Assistant · 昇腾服务器助手" />
+<meta property="og:description" content="让 AI 直接帮你操作/查询/排障华为昇腾智算服务器。与 AscendMate 手册深度配套。" />
+<meta property="og:url" content="https://RevolutionLA.github.io/ascend-assistant/" />
+<meta name="theme-color" content="#07090d" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --space-0:#060a11;--space-1:#0a111c;--space-2:#0f1a2b;
+  --ink:#dfe9f5;--ink-dim:#8fa6c0;--ink-faint:#5a6f8a;
+  --signal:#4db3ff;--signal-dim:rgba(77,179,255,0.18);--amber:#f2b24c;
+  --grid:rgba(120,160,210,0.07);--stroke:rgba(120,160,210,0.18);--stroke-bright:rgba(77,179,255,0.42);
+  --display:'Space Grotesk','Noto Sans SC',sans-serif;
+  --body:'Noto Sans SC',-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;
+  --mono:'JetBrains Mono','SFMono-Regular',Consolas,monospace;--max:1120px;--radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{color-scheme:dark;scroll-behavior:smooth}
+body{font-family:var(--body);background:var(--space-0);color:var(--ink);line-height:1.75;font-weight:300;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.mono{font-family:var(--mono)}em{font-style:normal;font-weight:600;color:var(--amber)}strong{font-weight:600;color:var(--ink)}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--signal);color:#04131f}
+.container{max-width:var(--max);margin:0 auto;padding:0 28px;position:relative}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 90% 70% at 50% 30%,#000 45%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 30%,#000 45%,transparent 100%)}
+
+header.site-header{position:sticky;top:0;z-index:60;background:rgba(6,10,17,0.75);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--stroke)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:66px;gap:20px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:600;font-size:15px}
+.brand-glyph{color:var(--signal);font-weight:700}
+.nav-right{display:flex;align-items:center;gap:22px}
+.nav-link{font-family:var(--mono);font-size:12px;letter-spacing:0.12em;color:var(--ink-dim);transition:color .2s;border:1px solid var(--stroke-bright);padding:8px 16px;border-radius:8px}
+.nav-link:hover{color:var(--signal);border-color:var(--signal)}
+
+.hero{position:relative;min-height:88vh;display:flex;flex-direction:column;justify-content:center;padding:72px 0;overflow:hidden}
+.hero::after{content:"";position:absolute;left:50%;top:10%;transform:translateX(-50%);width:820px;height:600px;background:radial-gradient(ellipse at center,rgba(77,179,255,0.10),transparent 62%);z-index:-1;pointer-events:none}
+.kicker{display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:0.2em;color:var(--signal);margin-bottom:28px;font-family:var(--mono)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--signal);box-shadow:0 0 0 4px var(--signal-dim),0 0 16px var(--signal)}
+.hero-title{font-family:var(--display);font-size:clamp(40px,8vw,92px);font-weight:700;letter-spacing:-0.02em;line-height:1.02;margin-bottom:20px;text-wrap:balance}
+.hero-title .en{background:linear-gradient(120deg,var(--signal) 0%,#a5d8ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-en{font-size:clamp(14px,1.8vw,18px);letter-spacing:0.26em;color:var(--ink-faint);font-family:var(--mono);margin-bottom:10px}
+.hero-zh{font-size:clamp(18px,2.6vw,25px);color:var(--ink);margin-bottom:12px}
+.hero-sub{font-size:15px;color:var(--ink-dim);max-width:640px;line-height:1.8}
+.hero-sub code{font-family:var(--mono);font-size:13px;color:var(--signal);background:var(--space-2);border:1px solid var(--stroke);padding:2px 8px;border-radius:6px}
+.hero-actions{display:flex;gap:16px;margin-top:44px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;letter-spacing:0.02em;padding:15px 30px;border-radius:12px;transition:all .25s;border:1px solid transparent;touch-action:manipulation}
+.btn-primary{background:var(--signal);color:#04131f;font-weight:600;box-shadow:0 0 24px var(--signal-dim)}
+.btn-primary:hover{background:#74c7ff;box-shadow:0 0 36px rgba(77,179,255,0.4);transform:translateY(-2px)}
+.btn-ghost{border:1px solid var(--stroke-bright);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--signal);color:var(--signal);box-shadow:0 0 20px var(--signal-dim)}
+.specbar{display:flex;flex-wrap:wrap;gap:28px;margin-top:52px;padding-top:28px;border-top:1px solid var(--stroke)}
+.spec{display:flex;align-items:baseline;gap:10px;font-size:13px;color:var(--ink-faint);font-family:var(--mono)}
+.spec strong{color:var(--signal);font-size:16px;font-weight:600}
+
+.section{padding:110px 0;position:relative}
+.sec-tag{display:inline-block;font-size:12px;letter-spacing:0.18em;color:var(--signal);margin-bottom:18px;font-family:var(--mono)}
+.sec-title{font-family:var(--display);font-size:clamp(32px,5vw,52px);font-weight:700;letter-spacing:-0.02em;line-height:1.1;margin-bottom:50px;text-wrap:balance}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+.card{background:linear-gradient(180deg,var(--space-2),var(--space-1));border:1px solid var(--stroke);border-radius:var(--radius);padding:32px;transition:transform .3s,border-color .3s,box-shadow .3s}
+.card:hover{transform:translateY(-5px);border-color:var(--stroke-bright);box-shadow:0 16px 44px rgba(0,0,0,0.5),0 0 28px var(--signal-dim)}
+.card-icon{font-size:26px;color:var(--signal);margin-bottom:16px;display:block}
+.card h3{font-family:var(--display);font-size:19px;font-weight:600;margin-bottom:12px}
+.card p{color:var(--ink-dim);font-size:15px;line-height:1.8}
+
+.ops{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.op{background:var(--space-1);border:1px solid var(--stroke);border-radius:12px;padding:24px}
+.op .cmd{font-family:var(--mono);font-size:13px;color:var(--signal);margin-bottom:12px}
+.op .what{font-size:14px;color:var(--ink);}
+.op .why{font-size:13px;color:var(--ink-faint);margin-top:6px}
+
+footer.site-footer{border-top:1px solid var(--stroke);padding:36px 0 46px}
+.footer-row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-faint);font-family:var(--mono)}
+.footer-row a:hover{color:var(--signal)}
+a:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:4px}
+@media (max-width:720px){.section{padding:76px 0}.hero{min-height:auto;padding:64px 0 80px}}
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="grid-bg" aria-hidden="true"></div>
+
+<header class="site-header">
+  <nav class="nav container">
+    <a class="brand" href="/"><span class="brand-glyph mono">&gt;_</span> ascend-assistant</a>
+    <div class="nav-right">
+      <a class="nav-link" href="https://github.com/RevolutionLA/ascend-assistant" target="_blank" rel="noopener noreferrer">SOURCE ↗</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <p class="kicker"><span class="dot"></span> AGENT_SKILL · ASCEND NPU OPS</p>
+    <div class="hero-en">ASCEND ASSISTANT</div>
+    <h1 class="hero-title">让 AI 帮你<br/><span class="en">运维昇腾</span></h1>
+    <p class="hero-zh">昇腾服务器助手 —— 直接操作、查询、排障华为昇腾智算服务器。</p>
+    <p class="hero-sub">这不是一个程序，而是一份交给 AI 的 <strong>操作规范（Skill）</strong>。问一句，它就按规程安全、准确地帮你做完。</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="https://github.com/RevolutionLA/ascend-assistant" target="_blank" rel="noopener noreferrer">在 GitHub 查看 →</a>
+      <a class="btn btn-ghost" href="/">REVLA 主页</a>
+    </div>
+    <div class="specbar">
+      <span class="spec">类型 <strong>Agent Skill</strong></span>
+      <span class="spec">目标 <strong>昇腾 NPU 服务器</strong></span>
+      <span class="spec">联动 <strong>AscendMate</strong></span>
+      <span class="spec">安装 <strong>3 种方式</strong></span>
+    </div>
+  </div>
+</section>
+
+<section class="section container" id="cap">
+  <span class="sec-tag">01 · 能力</span>
+  <h2 class="sec-title">它会做这些事</h2>
+  <div class="grid">
+    <article class="card reveal"><span class="card-icon">🩺</span><h3>环境检测 + 排障</h3><p>检测设备 / 驱动 / CANN / 框架状态，定位并解释报错，而不是丢给你一团日志。</p></article>
+    <article class="card reveal"><span class="card-icon">⌨️</span><h3>命令生成与建议</h3><p>生成安装、推理、微调等可直接复制的命令，并说明如何验证是否正确执行。</p></article>
+    <article class="card reveal"><span class="card-icon">🧭</span><h3>部署脚本引导</h3><p>从裸机到跑起来，按 7 步 step-by-step——新到一台服务器也能照着走完。</p></article>
+    <article class="card reveal"><span class="card-icon">📈</span><h3>性能调优建议</h3><p>基于 Profiling 数据给出调优方向，帮你在推理 / 训练场景榨出硬件能力。</p></article>
+  </div>
+</section>
+
+<section class="section container" id="ops">
+  <span class="sec-tag">02 · 直接用</span>
+  <h2 class="sec-title">对 AI 说一句话，它就开始干</h2>
+  <div class="ops">
+    <div class="op"><div class="cmd">> 检查这台昇腾服务器的环境是否正常</div><div class="what">触发环境检测</div><div class="why">npu-smi / CANN / 框架一键检视</div></div>
+    <div class="op"><div class="cmd">> torch_npu 装不上，帮我看看</div><div class="what">进入排障模式</div><div class="why">定位 driver not initialized 等异常</div></div>
+    <div class="op"><div class="cmd">> 按 7 步带我从裸机跑起推理</div><div class="what">部署脚本引导</div><div class="why">环境核实 → 安装 → 验证</div></div>
+    <div class="op"><div class="cmd">> 推理吞吐低，帮我分析怎么调优</div><div class="what">性能调优建议</div><div class="why">基于 Profiling 输出方向</div></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container footer-row">
+    <span>© <span id="year"></span> 刘昂 (RevolutionLA)</span>
+    <span><a href="/">revolutionla.github.io</a> · <a href="https://github.com/RevolutionLA/ascend-assistant" target="_blank" rel="noopener noreferrer">ascend-assistant ↗</a></span>
+  </div>
+</footer>
+
+<script>
+document.getElementById('year').textContent=new Date().getFullYear();
+var els=document.querySelectorAll('.card');var io='IntersectionObserver'in window?new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('visible');io.unobserve(x.target)}})},{threshold:0.1}):null;
+els.forEach(function(el){if(io){el.classList.add('reveal');io.observe(el)}else{el.classList.add('visible')}});
+</script>
+</body>
+</html>
