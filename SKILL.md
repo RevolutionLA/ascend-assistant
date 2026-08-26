@@ -2,7 +2,7 @@
 name: ascend-assistant
 description: >
   昇腾服务器助手 —— 让 AI 直接帮你操作、查询、排障华为昇腾（Ascend/NPU）智算服务器。
-  覆盖四类能力：环境检测与排障、命令生成与建议、部署脚本引导、性能调优建议。
+  覆盖六类能力：环境检测与排障、命令生成与建议、部署脚本引导、性能调优建议、集群巡检与报告、算力利用率分析。
   当用户遇到昇腾装机、驱动/CANN/框架报错、想生成安装/推理/调优命令、需要把昇腾服务器跑起来，
   或需要性能调优时使用。与 AscendMate（昇腾之家）手册深度联动。
 keywords:
@@ -24,7 +24,7 @@ keywords:
 license: MIT
 metadata:
   author: AscendLA
-  version: "2.0.0"
+  version: "3.0.0"
   skill-type: orchestration
   allowed-tools: Bash(*) Python3(*) Read(*) Edit(*)
 ---
@@ -34,7 +34,7 @@ metadata:
 让 AI Agent 帮助用户操作昇腾智算服务器的一套技能（Skill）。当用户对着一台昇腾服务器提问时，AI 依据本 Skill 安全、准确地帮你：检测环境、定位报错、生成命令、引导部署、给出调优建议。
 
 **本 Skill 是"混合模式"**：
-- **内建完成**四类通用能力（覆盖绝大多数日常提问）；
+- **内建完成**六类通用能力（覆盖绝大多数日常提问）；
 - 遇到**专项深度任务**（复杂 profiling 分析、驱动自动安装、算子代码生成等），**路由到昇腾官方 `agent-skills` 中的成熟 skill**，避免重复造轮子。
 
 配套完整手册：**[AscendMate（昇腾之家）](https://github.com/RevolutionLA/AscendMate)** —— AscendMate 负责"为什么、完整怎么做"；本 Skill 负责"你手头这台机器、现在就帮我做"。
@@ -50,12 +50,14 @@ metadata:
 - 想生成/确认命令：安装命令、启动推理服务命令、微调脚本、性能采集命令等。
 - 想从裸机一步步把昇腾服务器跑起来（部署引导）。
 - 想对推理/训练做性能调优。
+- 想批量检查多台服务器的健康状态（集群巡检）。
+- 想了解算力利用率情况并获取优化建议（利用率分析）。
 
 > 不触发：纯硬件采购选型、商务问题 → 引导到 [AscendMate 硬件选型](/hardware/)。
 
 ---
 
-## 四类内建能力
+## 六类内建能力
 
 ### 能力一：环境检测与排障
 
@@ -122,6 +124,63 @@ bash scripts/quick_troubleshoot.sh
 - 现象 → 建议方向表见 [references/perf-tuning.md](references/perf-tuning.md)。
 - 完整工具说明见 [AscendMate 性能调优](/tools/profiling)。
 
+### 能力五：集群巡检与报告
+
+**目标**：批量检查多台昇腾服务器，生成巡检报告。
+
+**批量巡检流程**：
+1. 用户提供服务器 IP 列表（或 SSH 配置）
+2. AI 生成批量巡检脚本，通过 SSH 到每台机器运行只读检测
+3. 收集结果并汇总为 Markdown 巡检报告
+
+**巡检脚本使用**：
+
+```bash
+# 批量巡检（需提供服务器列表）
+bash scripts/cluster_inspection.sh servers.txt
+# 或手动指定
+bash scripts/cluster_inspection.sh 192.168.1.101 192.168.1.102 192.168.1.103
+```
+
+**巡检报告解读要点**：
+- **设备健康**：每台机器 NPU 数量、Health 状态（Normal/Warning/Critical）
+- **版本一致性**：驱动版本、CANN 版本是否集群一致
+- **异常项汇总**：温度过高、掉卡、ECC 错误、链路异常
+- **巡检结论**：通过/不通过 + 不通过项的修复建议
+
+> 巡检脚本仅只读，无危险操作。完整巡检 SOP 见 [AscendMate 巡检与应急 SOP](/monitoring/inspection)。
+
+### 能力六：算力利用率分析
+
+**目标**：采集 NPU 利用率数据，给出优化建议。
+
+**利用率采集方法**：
+
+```bash
+# 方法一：npu-smi 定时采集（简单）
+watch -n 5 'npu-smi info | grep -E "Chip|Utilization"'
+
+# 方法二：通过 Prometheus 查询（推荐，需已部署监控）
+# 查询近7天平均算力利用率
+avg_over_time(npu_utilization_ratio[7d])
+# 查询空闲时长占比
+avg_over_time(npu_utilization_ratio{ratio<10}[7d])
+```
+
+**关键指标**：
+- **算力利用率**：NPU 计算单元使用率，健康范围 40%-85%
+- **显存利用率**：HBM 使用率，关注是否持续 100%（OOM 风险）
+- **空闲时长**：利用率 <10% 的时间占比
+- **碎片率**：单卡被小任务占满但未充分利用的比例
+
+**利用率低常见原因与建议**：
+- **任务排队空窗** → 建议引入作业调度系统（Slurm/KubeSphere）
+- **批次太小** → 建议增大 batch size 或使用梯度累积
+- **数据加载瓶颈** → 建议增加 DataLoader workers 或使用共享存储
+- **闲置卡未分配** → 建议启用 vNPU 分片或资源池化
+
+> 完整利用率优化方案见 [AscendMate 算力利用率监控与优化](/operations/utilization)，监控搭建见 [运维监控](/monitoring/)。
+
 ---
 
 ## 官方 skill 路由表（混合模式）
@@ -161,6 +220,7 @@ bash scripts/quick_troubleshoot.sh
 | [references/command-reference.md](references/command-reference.md) | 命令生成时，查常用命令库 |
 | [references/deployment-workflow.md](references/deployment-workflow.md) | 部署引导时，查 7 段工作流模板 |
 | [references/perf-tuning.md](references/perf-tuning.md) | 性能调优时，查现象→方向表 |
+| [references/cluster-inspection.md](references/cluster-inspection.md) | 集群巡检时，查批量检查流程与报告模板 |
 
 ---
 
@@ -175,6 +235,9 @@ bash scripts/quick_troubleshoot.sh
 | 命令生成 | [训练](/training/) · [推理](/inference/) |
 | 部署引导 | [7 步走](/guide/seven-steps) |
 | 性能调优 | [性能调优 Profiling](/tools/profiling) |
+| 集群巡检 | [巡检与应急 SOP](/monitoring/inspection) |
+| 利用率分析 | [算力利用率监控与优化](/operations/utilization) |
+| 监控告警 | [运维监控](/monitoring/) |
 
 ---
 

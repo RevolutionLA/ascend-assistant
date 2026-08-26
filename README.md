@@ -1,5 +1,7 @@
 # Ascend Assistant · 昇腾服务器助手
 
+> v3.0.0
+
 > 让 AI 助手直接帮你操作/查询/排障华为昇腾（Ascend/NPU）智算服务器的 **Agent Skill**。
 > 与 [AscendMate（昇腾之家）](https://github.com/RevolutionLA/AscendMate) 深度配套：AscendMate 是完整手册，本 Skill 负责"遇到问题怎么一步步操作"。
 
@@ -13,6 +15,8 @@
 | **命令生成与建议** | 生成安装、推理、微调等可直接复制的命令，并说明验证方法 |
 | **部署脚本引导** | 从裸机到跑起，step-by-step 引导 |
 | **性能调优建议** | 基于 Profiling 数据给调优方向 |
+| **集群巡检与报告** | 批量检查多台服务器健康状态，生成巡检报告 |
+| **算力利用率分析** | 采集NPU利用率数据，分析低效原因，给出优化建议 |
 
 ## 安装（3 种方式）
 
@@ -43,6 +47,8 @@ git clone https://github.com/RevolutionLA/ascend-assistant.git
 - "在 openEuler + CANN 8.3.RC2 上给我安装 torch_npu 的命令" （→ 命令生成）
 - "按 7 步带我把这台裸机昇腾服务器跑起来" （→ 部署引导）
 - "推理吞吐低，帮我分析怎么调优" （→ 性能调优）
+- "帮我批量检查这10台昇腾服务器的状态" （→ 集群巡检）
+- "最近一周算力利用率怎么样，有没有优化建议" （→ 利用率分析）
 
 ## 端到端用例演示
 
@@ -109,6 +115,17 @@ bash scripts/quick_troubleshoot.sh    # ✗ 项即问题点 + 指向手册章节
   - 算子开发 → `ascendc-operator-*` / `triton-operator-*`
 
 > 路由规则见 [SKILL.md](SKILL.md) 的「官方 skill 路由表」。这样既吸收官方成熟能力，又避免重复造轮子。
+
+## 🔗 与 AscendMate 联动
+
+本 Skill 的新增能力与 AscendMate（昇腾之家）文档站深度联动：
+
+| 能力 | 联动文档 |
+|---|---|
+| 集群巡检 | → AscendMate [/monitoring/inspection](https://revolutionla.github.io/AscendMate/monitoring/inspection) |
+| 利用率分析 | → AscendMate [/operations/utilization](https://revolutionla.github.io/AscendMate/operations/utilization) |
+
+> Skill 负责"怎么一步步操作"，AscendMate 提供"背景知识 / SOP / 配置模板 / 最佳实践"。
 
 ## 能力详解 & 配套手册
 
