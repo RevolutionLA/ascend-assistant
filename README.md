@@ -140,6 +140,10 @@ bash scripts/quick_troubleshoot.sh    # ✗ 项即问题点 + 指向手册章节
 - 昇腾文档中心：<https://www.hiascend.com/document>
 - 昇腾软件下载：<https://www.hiascend.com/developer/download>
 
+## 同作者的其他项目
+
+- **[adversarial-review](https://github.com/RevolutionLA/adversarial-review)** —— 三方对抗式代码评审 Agent Skill。蓝军（敌意审查）→ 第三方（独立审计）→ 中立裁定。**写 skill、发版前把关时特别有用。**
+
 ## 许可
 
 [MIT](LICENSE)。本 Skill 基于公开资料整理，命令与版本以官方发布为准；高风险操作请谨慎并自行担责。
