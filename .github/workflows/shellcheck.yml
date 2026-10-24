@@ -1,0 +1,49 @@
+name: shellcheck
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 语法错误（bash -n）一律红：这类问题会直接让用户在服务器上收到一堆报错。
+      - name: Bash syntax check (hard gate)
+        run: |
+          set -e
+          fail=0
+          for f in $(find scripts -name '*.sh'); do
+            if bash -n "$f"; then echo "✅ syntax $f"; else echo "::error file=$f::bash 语法错误"; fail=1; fi
+          done
+          exit $fail
+
+      # shellcheck 全量扫描：只把 severity=error 判红。
+      # warning/info 先作为报告输出，逐步收敛 —— 一上来全判红会让真问题被噪音淹没。
+      - name: shellcheck (errors block, warnings report)
+        run: |
+          set +e
+          shellcheck --version
+          echo "--- severity=error（判红）---"
+          shellcheck -S error -f gcc $(find scripts -name '*.sh')
+          rc=$?
+          echo "--- severity=warning 及以下（仅报告）---"
+          shellcheck -S warning -f gcc $(find scripts -name '*.sh') || true
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::shellcheck 在 error 级别发现问题"
+            exit 1
+          fi
+
+      # 脚本引用的路径必须真实存在（防止 README 指向已删除的脚本）。
+      - name: Referenced scripts exist
+        run: |
+          set -e
+          missing=0
+          for f in $(grep -oE 'scripts/[a-z_]+\.sh' README.md SKILL.md references/*.md | cut -d: -f2 | sort -u); do
+            if [ -f "$f" ]; then echo "✅ $f"; else echo "::error::文档引用了不存在的脚本 $f"; missing=1; fi
+          done
+          exit $missing

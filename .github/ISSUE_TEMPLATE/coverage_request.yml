@@ -1,0 +1,23 @@
+name: 能力/场景补充请求
+description: 希望 Skill 支持新的排障场景、命令或机型
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: scenario
+    attributes:
+      label: 场景描述
+      description: 你在什么情况下希望 AI 帮你做什么？
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: 可依据的资料
+      description: 官方文档链接、报错原文、实测记录（AscendMate 对应页面优先）
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: 边界确认
+      options:
+        - label: 我理解「命令事实以 AscendMate 为准，本 Skill 只做决策与引导」
+          required: true

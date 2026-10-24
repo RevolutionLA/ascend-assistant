@@ -1,0 +1,30 @@
+name: 脚本或 Skill 行为异常
+description: 脚本在你机器上失败、或 AI 按 Skill 操作后结果不对
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        昇腾环境差异极大，没有环境信息基本无法复现。请尽量填全。
+  - type: textarea
+    id: env
+    attributes:
+      label: 环境
+      description: 机型 / OS / CANN / 驱动固件 / torch_npu 版本
+      placeholder: Atlas 800T A2 · openEuler 22.03 · CANN 8.3.RC2 · 驱动 24.1.RC2 · torch_npu 2.5.1
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: 复现步骤与原始输出
+      description: 直接粘贴命令与 stdout/stderr，不要转述
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望 vs 实际
+    validations:
+      required: true

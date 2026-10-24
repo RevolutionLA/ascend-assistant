@@ -118,6 +118,19 @@ bash scripts/quick_troubleshoot.sh    # ✗ 项即问题点 + 指向手册章节
 
 ## 🔗 与 AscendMate 联动
 
+> **分工边界（SSOT）**：**命令/参数/版本细节以 [AscendMate](https://github.com/RevolutionLA/AscendMate) 为唯一事实源（Single Source of Truth）**，本 Skill 只持有三样东西：**决策树**（先查什么、后查什么）、**引导流程**（怎么一步步问用户要信息）、**路由规则**（什么问题转哪篇手册/哪个脚本）。这样做的理由：同一份命令写两处，早晚会漂移，而漂移的文档比没有文档更危险。
+
+当前 `references/` 中与 AscendMate 存在内容重叠、需按上述边界逐步收敛的文件（**只登记，暂不删除**）：
+
+| 文件 | 重叠内容 | 收敛方向 |
+|---|---|---|
+| `references/command-reference.md` | 安装/推理命令参数 | 保留「何时用哪条」，命令本体改为链到 AscendMate 对应页 |
+| `references/deployment-workflow.md` | 裸机到跑起的步骤 | 保留决策分支，步骤细节链到 AscendMate `docs/setup/` |
+| `references/perf-tuning.md` | 调优参数建议 | 保留「先测什么指标」，阈值表以 AscendMate 为准 |
+| `references/troubleshooting-map.md` | 报错 → 根因映射 | 本文件是本 Skill 的核心资产，保留并对 AscendMate `docs/faq/` 反向输出 |
+| `references/cluster-inspection.md` | 巡检项清单 | 与 `scripts/cluster_inspection.sh` 实装对齐 |
+
+
 本 Skill 的新增能力与 AscendMate（昇腾之家）文档站深度联动：
 
 | 能力 | 联动文档 |

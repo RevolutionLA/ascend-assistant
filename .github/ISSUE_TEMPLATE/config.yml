@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 完整的昇腾部署手册
+    url: https://revolutionla.github.io/AscendMate/
+    about: 命令、参数、版本细节以 AscendMate 为唯一事实源
